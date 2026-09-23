@@ -1,0 +1,52 @@
+@startuml MultiCardATM
+
+' --- Classes ---
+
+class Card {
+    + String card_number
+    + String holder_name
+    + String pin
+    + float balance
+    + List<String> transactions
+    --
+    + deposit(float amount) : void
+    + withdraw(float amount) : void
+    + change_pin(String old_pin, String new_pin) : void
+    + verify_pin(String entered_pin) : bool
+    + log_transaction(String description) : void
+    + show_mini_statement() : void
+    + masked_number() : String
+    + to_dict() : dict
+    {static} + from_dict(dict data) : Card
+}
+
+class ATMSystem {
+    + Dict<String, Card> cards
+    + Card active_card
+    --
+    + generate_card_number() : String
+    + add_card(String holder_name, String pin, float opening_balance) : Card
+    + delete_card(String card_number) : void
+    + list_cards() : void
+    + find_card_by_last4(String last4_or_full) : Card
+    + save_data() : void
+    + load_data() : void
+}
+
+class MainCLI {
+    + get_amount(String prompt) : float
+    + print_main_menu() : void
+    + print_card_menu(Card card) : void
+    + card_session(ATMSystem atm, Card card) : String
+    + select_and_login(ATMSystem atm) : String
+    + main() : void
+}
+
+' --- Relationships ---
+
+ATMSystem "1" *-- "0..*" Card : manages / stores >
+ATMSystem "1" o-- "0..1" Card : active_card >
+MainCLI ..> ATMSystem : interacts with
+MainCLI ..> Card : accesses session methods
+
+@enduml
